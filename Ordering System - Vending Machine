@@ -1,0 +1,218 @@
+using System;
+using System.Collections.Generic;
+
+class JunasMachine
+{
+    // Dictionary to store items and their prices
+    private Dictionary<int, (string Name, double Price)> items;
+
+    // Variables to track money, purchases, and purchased items
+    private double credit = 0.0;
+    private double totalSpent = 0.0;
+    private List<(string Name, double Price)> purchasedItems = new List<(string, double)>();
+
+    public JunasMachine()
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.BackgroundColor = ConsoleColor.White;
+
+        Console.WriteLine("Welcome to our Junas Ordering System!");
+        Console.Title = "Ordering System";
+        Console.WriteLine("");
+        string username, password;
+        string storedUsername = "Junas";
+        string storedPassword = "1234";
+
+        Console.ForegroundColor = ConsoleColor.Black;
+        Console.BackgroundColor = ConsoleColor.White;
+
+        Console.Write("Enter username: ");
+        username = Console.ReadLine();
+        Console.Write("Enter password: ");
+        password = Console.ReadLine();
+        Console.WriteLine("");
+
+        if (username != storedUsername || password != storedPassword)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("Invalid username or password. Exiting...");
+            Environment.Exit(0); // Stop the program if login fails
+        }
+        Console.ForegroundColor = ConsoleColor.DarkYellow;
+        Console.Write("Insert money: Php ");
+        if (double.TryParse(Console.ReadLine(), out double money) && money > 0)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            credit += money;
+            Console.WriteLine($"Added Php{money:F2}. Total credit: Php{credit:F2}");
+        }
+        else
+        {
+
+            Console.WriteLine("Invalid amount. Please enter a number.");
+            Environment.Exit(0); // Stop the program if invalid money is entered
+        }
+
+        // Initialize the vending machine with some items
+        items = new Dictionary<int, (string, double)>
+        {
+            { 1, ("Coke", 20.00) },
+            { 2, ("Pepsi", 13.50) },
+            { 3, ("Water", 25.50) },
+            { 4, ("Chips", 10.25) },
+            { 5, ("Chocolate", 15.75) }
+        };
+    }
+
+    public void DisplayItems()
+    {
+        Console.ForegroundColor = ConsoleColor.DarkBlue;
+        Console.BackgroundColor = ConsoleColor.White;
+        Console.WriteLine("Welcome to Heaven!");
+        Console.WriteLine("\n====Product Menu====");
+        foreach (var item in items)
+        {
+            Console.WriteLine($"{item.Key}. {item.Value.Name} - Php{item.Value.Price:F2}");
+        }
+        Console.WriteLine("======================");
+        Console.WriteLine("");
+        Console.ForegroundColor = ConsoleColor.Black;
+        Console.WriteLine($"Your current credit: Php {credit:F2}");
+        Console.WriteLine("");
+    }
+
+    public void PurchaseItem()
+    {
+        Console.Write("Enter the item number to purchase: ");
+        if (int.TryParse(Console.ReadLine(), out int choice))
+        {
+            if (items.ContainsKey(choice))
+            {
+                var selectedItem = items[choice];
+                if (credit >= selectedItem.Price)
+                {
+                    // Deduct the price from credit and add to total spent
+                    credit -= selectedItem.Price;
+                    totalSpent += selectedItem.Price;
+
+                    // Add the item to the purchased items list
+                    purchasedItems.Add((selectedItem.Name, selectedItem.Price));
+
+                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+
+                    Console.WriteLine($"You have purchased {selectedItem.Name} for Php {selectedItem.Price:F2}.");
+
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    Console.WriteLine($"Remaining credit: Php{credit:F2}");
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine("Insufficient credit. Cannot make a purchase.");
+                    DisplayReceipt(); // Show receipt if the user doesn't have enough credit
+                    Environment.Exit(0); // Stop the program
+                }
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.WriteLine("Invalid item number. Please try again.");
+            }
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("Invalid input. Please enter a number.");
+        }
+    }
+
+    public void DisplayReceipt()
+    {
+        if (purchasedItems.Count == 0)
+        {
+            Console.ForegroundColor = ConsoleColor.Black;
+            Console.WriteLine("No items purchased.");
+            return;
+        }
+
+        Console.WriteLine("\n--- Receipt ---");
+        Console.WriteLine("Purchased Items:");
+        foreach (var item in purchasedItems)
+        {
+            Console.WriteLine($"{item.Name} - Php {item.Price:F2}");
+        }
+        Console.WriteLine($"Total Amount Spent: Php {totalSpent:F2}");
+        Console.WriteLine($"Money Inserted: Php {totalSpent + credit:F2}"); // Money inserted = total spent + remaining credit
+        Console.WriteLine($"Change Returned: Php {credit:F2}");
+        Console.WriteLine("---------------");
+    }
+
+    public void Start()
+    {
+        while (true)
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.WriteLine("=== Welcome to our system ===");
+            Console.WriteLine("");
+            DisplayItems();
+
+            while (true)
+            {
+                Console.WriteLine("1. Purchase Item");
+                Console.WriteLine("2. View Receipt");
+                Console.WriteLine("3. Finish Transaction");
+                Console.Write("Enter Option: ");
+
+                if (int.TryParse(Console.ReadLine(), out int option))
+                {
+                    switch (option)
+                    {
+                        case 1:
+                            PurchaseItem();
+                            break;
+                        case 2:
+                            DisplayReceipt();
+                            break;
+                        case 3:
+                            DisplayReceipt();
+                            Console.ForegroundColor = ConsoleColor.DarkGreen;
+                            Console.WriteLine("Thank you for using the vending machine!");
+                            Environment.Exit(0); // Stop the program
+                            break;
+                        default:
+                            Console.ForegroundColor = ConsoleColor.DarkRed;
+                            Console.WriteLine("Invalid option. Please try again.");
+                            break;
+                    }
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine("Invalid input. Please enter a number.");
+                }
+
+                Console.ForegroundColor = ConsoleColor.Black;
+                Console.Write("Anything else? (yes/no): ");
+                string response = Console.ReadLine().ToLower();
+
+                if (response != "yes")
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    DisplayReceipt(); // Show receipt before exiting
+                    Console.WriteLine("OKAY NA TOH!");
+                    Environment.Exit(0); // Stop the program
+                }
+            }
+        }
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        JunasMachine junasmachine = new JunasMachine();
+        junasmachine.Start();
+    }
+}
