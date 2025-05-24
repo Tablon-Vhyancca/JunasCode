@@ -4,7 +4,7 @@ Josh Lander Ferrera - Front End Programmer
 
 Edward Marcelino - Front & Back End Programmer
 
-Jonamae Obordo - Front End Programmer
+Jonamae Obordo - Front End Programmer/Tester
 
 Marvhenne Klein Ortega - Front & Back End Programmer
 
